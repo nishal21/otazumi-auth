@@ -460,7 +460,8 @@ export class AuthService {
           syncData.favorites.map(fav => ({
             userId,
             animeId: fav.animeId || fav.id,
-            animeData: fav
+            title: fav.title || fav.name || 'Unknown',
+            poster: fav.poster || fav.image || null
           }))
         );
       }
@@ -475,8 +476,9 @@ export class AuthService {
           syncData.watchlist.map(item => ({
             userId,
             animeId: item.animeId || item.id,
-            status: item.status || 'watching',
-            animeData: item
+            title: item.title || item.name || 'Unknown',
+            poster: item.poster || item.image || null,
+            status: item.status || 'plan_to_watch'
           }))
         );
       }
@@ -492,9 +494,8 @@ export class AuthService {
             userId,
             animeId: item.animeId,
             episodeId: item.episodeId,
-            episodeNumber: item.episodeNumber,
+            episodeNumber: item.episodeNumber || 1,
             progress: item.progress || 0,
-            duration: item.duration || 0,
             completed: item.completed || false,
             watchedAt: item.watchedAt ? new Date(item.watchedAt) : new Date()
           }))
@@ -526,8 +527,21 @@ export class AuthService {
       .where(eq(watchHistory.userId, userId));
 
     return {
-      favorites: userFavorites.map(f => f.animeData),
-      watchlist: userWatchlist.map(w => ({ ...w.animeData, status: w.status })),
+      favorites: userFavorites.map(f => ({
+        id: f.animeId,
+        animeId: f.animeId,
+        title: f.title,
+        poster: f.poster,
+        addedAt: f.addedAt
+      })),
+      watchlist: userWatchlist.map(w => ({
+        id: w.animeId,
+        animeId: w.animeId,
+        title: w.title,
+        poster: w.poster,
+        status: w.status,
+        addedAt: w.addedAt
+      })),
       watchHistory: userWatchHistory
     };
   }
